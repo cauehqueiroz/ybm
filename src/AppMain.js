@@ -20,13 +20,13 @@ class AppMain extends React.Component {
                 <header>
                     <ul className="nav">
                         <li className="nav-item">
-                            <Link to="/">Home</Link>
+                            <Link className="nav-link" to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/favorites">Favorites</Link>
+                            <Link className="nav-link" to="/favorites">Favorites</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/about">About</Link>
+                            <Link className="nav-link" to="/about">About</Link>
                         </li>
                     </ul>
                 </header>
