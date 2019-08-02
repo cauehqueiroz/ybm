@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import Home from './Home.js';
 import Favorites from './Favorites.js';
 import About from './About.js';
+import Details from './Details.js';
 
 class AppMain extends React.Component {
     // constructor() {
@@ -15,7 +16,7 @@ class AppMain extends React.Component {
 
     render() {
         return (
-        <div>
+        <div className="container">
             <BrowserRouter>
                 <header>
                     <ul className="nav">
@@ -35,6 +36,7 @@ class AppMain extends React.Component {
                     <Route path="/" exact={true} component={Home} />
                     <Route path="/favorites" component={Favorites} />
                     <Route path="/about" component={About} />
+                    <Route path="/details/:imdbID" component={Details} />
                 </Switch>
                 </main>
             </ BrowserRouter>
