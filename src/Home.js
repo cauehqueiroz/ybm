@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom' 
-// import axios from 'axios'
+import axios from 'axios'
 
 class Home extends React.Component {
 
@@ -11,6 +11,7 @@ class Home extends React.Component {
         this.state = {
             sortByDate: false,
             showType: 'movie', // movie or series
+            details: undefined, // details
             movies: [
                 {
                     "Position": 1,
@@ -153,6 +154,7 @@ class Home extends React.Component {
         this.handleChangeShowType = this.handleChangeShowType.bind(this);
         this.handleChangeSortByDate = this.handleChangeSortByDate.bind(this);
         this.handleClickFavorite = this.handleClickFavorite.bind(this);
+        this.handleClickDetails = this.handleClickDetails.bind(this);
         this.getList = this.getList.bind(this);
 
         this.bannerMovies = [];
@@ -178,7 +180,7 @@ class Home extends React.Component {
         return (
             <div key={topMovie.imdbID} className={"carousel-item " + (i === 0 ? "active" : "") }>
             <Link className="nav-link" to={topMovieUrl}>
-                <h5>#1 { topMovie.Type } - { topMovie.Title }</h5>
+                <h4 className="text-light">#1 { topMovie.Type } - { topMovie.Title }</h4>
                 <img className="img-responsive " src={topMovie.Poster} alt="First slide"/>
             </Link>
         </div>);
@@ -186,12 +188,38 @@ class Home extends React.Component {
 
     getList(movie, i) {
         let topMovieUrl = "/details/" + movie.imdbID;
+        let details = this.state.details;
         return (
             <li key={movie.imdbID} className="list-group-item">
                 <Link to={topMovieUrl}>#{ movie.Position } - {movie.Title}</Link> ({ movie.Year})
                 <i className={"fa fa-heart ml-3 " + (movie.Favorite ? 'text-danger' : 'text-secondary')} onClick={(e) => this.handleClickFavorite(movie)}></i>
+                <i className={"fa fa-info-circle ml-3 " + (details !== undefined && movie.imdbID === details.imdbID ? 'text-success' : 'text-secondary')} onClick={(e) => this.handleClickDetails(movie)}></i>
             </li>
         );
+    }
+
+    setDetails(details) {
+        this.setState({details: details});
+    }
+
+    fetchInfo(imdbID) {
+        let self = this;
+        axios.get('http://www.omdbapi.com', {
+            params: {
+                apikey: 'f978b7fd',
+                plot: 'short',
+                i: imdbID
+            }
+          })
+          .then(function (response) {
+              self.setDetails(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+          .then(function () {
+            // always executed
+          });  
     }
 
     render() {
@@ -225,6 +253,22 @@ class Home extends React.Component {
 
         let MovieList = this.state.sortByDate ? this.getMovieOrderByDate(this.state.movies) : this.getMovieOrderByPosition(this.state.movies);
         MovieList = MovieList.filter(movie => movie.Type === this.state.showType).map(this.getList);
+        
+        let MovieDetails = "";
+        if(this.state.details !== undefined) {
+            MovieDetails = (
+                <div>
+                    <h2 className="text-info">Movie Details</h2>
+                    <h3>{ this.state.details.Title } <small className="text-secondary">({ this.state.details.Type })</small></h3>
+                    <div>
+                        <h4>Overview</h4>
+                        <div>{ this.state.details.Plot }</div>
+                        <div><strong>Runtime: </strong>{this.state.details.Runtime }</div>
+                        <div><strong>Rating:</strong> {this.state.details.imdbRating }</div>
+                    </div>
+                </div>
+            );
+        }
 
         return (
         <div>
@@ -273,7 +317,7 @@ class Home extends React.Component {
                     </ul>
                 </div>
                 <div className="col">
-                    
+                    { MovieDetails }
                 </div>
             </div>
         </section>
@@ -307,6 +351,10 @@ class Home extends React.Component {
             return 0;
         });
         return movies;
+    }
+
+    handleClickDetails(movieClicked) {
+        this.fetchInfo(movieClicked.imdbID);
     }
 
     handleClickFavorite(movieClicked) {
