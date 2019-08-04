@@ -16,11 +16,12 @@ class Details extends React.Component {
     }
 
     renderRating(rating) {
-        return <li className="list-group-item">{ rating.Value } @ { rating.Source }</li>;
+        return <li key={rating.Source} className="list-group-item">{ rating.Value } @ { rating.Source }</li>;
     }
     render() {
         if(this.state.details !== undefined) {
-            let ratings = this.state.details.Ratings ? this.state.details.Ratings : [];
+            let ratings = this.state.details.Ratings.length > 0 ? (<div><h3>Ratings</h3><ul className="list-group">{ this.state.details.Ratings.map(this.renderRating)}</ul></div>)
+             : [];
             return (
             <div>
                 <h1>{ this.state.details.Title } <small className="text-secondary">({ this.state.details.Type })</small></h1>
@@ -31,10 +32,7 @@ class Details extends React.Component {
                     <div><strong>Runtime: </strong>{this.state.details.Runtime }</div>
                     <div><strong>Cast:</strong> {this.state.details.Actors }</div>
                 </div>
-                <h3>Ratings</h3>
-                <ul className="list-group">
-                    { ratings.map(this.renderRating)}
-                </ul>
+                { ratings }
             </div>
             )
         }else {
@@ -51,6 +49,7 @@ class Details extends React.Component {
         axios.get('http://www.omdbapi.com', {
             params: {
                 apikey: 'f978b7fd',
+                plot: 'full',
                 i: imdbID
             }
           })
